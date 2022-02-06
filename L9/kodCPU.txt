@@ -1,0 +1,33 @@
+%%cu
+#include <stdio.h>
+#define N 1024
+  void add(int *a, int *b, int *c) {
+  int tid = 0; 
+  while (tid < N) {
+    c[tid] = a[tid] + b[tid];
+    tid += 1;
+  }
+  }
+int main() {
+  cudaEvent_t start, stop;
+  cudaEventCreate( &start ) ;
+  cudaEventCreate( &stop ) ;
+  cudaEventRecord( start, 0 ) ;
+  int a[N], b[N], c[N];
+  for (int i=0; i<N; i++) {
+    a[i] = i;
+    b[i] = i * i;
+  }
+  add( a, b, c );
+  for (int i=0; i<N; i++) {
+  printf("%d + %d = %d\n", a[i], b[i], c[i] );
+  }
+  cudaEventRecord( stop, 0 );
+  cudaEventSynchronize( stop );
+  float czas;
+  cudaEventElapsedTime( &czas, start, stop );
+  printf( "Czas wykonania %3.2f ms\n", czas );
+  cudaEventDestroy(start);
+  cudaEventDestroy(stop);
+  return 0;
+  }
